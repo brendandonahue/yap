@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "crates/shared",
+    "crates/backend",
+    "src-tauri",
+]
+resolver = "3"

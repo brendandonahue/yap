@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  surrealdb:
+    image: surrealdb/surrealdb:latest
+    command: start --user root --pass root
+    ports:
+      - "8000:8000"
+    volumes:
+      - surrealdb-data:/var/lib/surrealdb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  redis:
+    image: redis:7.4  # Latest stable in 2025; use alpine for lighter
+    command: redis-server /usr/local/etc/redis/redis.conf  # Optional custom conf
+    ports:
+      - "6379:6379"  # Expose for tools like redis-cli
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf  # Mount if customizing
+      - redis-data:/data  # Persistent storage
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: /usr/local/bin/backend
+    ports:
+      - "50051:50051"
+    depends_on:
+      surrealdb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - SURREALDB_URL=http://surrealdb:8000
+      - SURREALDB_NS=test
+      - SURREALDB_DB=test
+      - SURREALDB_USER=root
+      - SURREALDB_PASS=root
+      - REDIS_URL=redis://redis:6379/  # Connect here
+    volumes:
+      - .:/app
+
+  envoy:
+    image: envoyproxy/envoy:v1.31.0
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+
+  frontend:
+    image: node:22
+    working_dir: /app/frontend
+    command: npm run dev -- --host
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./src:/app/frontend
+    depends_on:
+      - envoy
+
+volumes:
+  surrealdb-data:
+  redis-data:

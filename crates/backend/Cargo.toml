@@ -1,0 +1,10 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+redis = { version = "1.0.1", features = ["tokio-comp"] }
+surrealdb = { version = "2.4.0", features = ["protocol-http", "kv-mem"] }
+tokio = "1.48.0"
+tonic = "0.14.2"

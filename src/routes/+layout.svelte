@@ -1,4 +1,5 @@
 <script>
+  import "../app.css"
   import Dock from '../lib/Dock.svelte';  // Adjust path if needed
 </script>
 

@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "yap",
-        "width": 800,
-        "height": 600
+        "width": 1920,
+        "height": 1080
       }
     ],
     "security": {
@@ -30,6 +30,9 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "resources": [
+      "resources/*.gguf"
     ]
   }
 }

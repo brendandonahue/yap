@@ -1,4 +1,4 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+
 #[tauri::command]
 fn yap(name: &str) -> String {
     format!("Hello, {}! This is where the ai will start yapping uncontrollably, but still 
@@ -17,6 +17,7 @@ fn inform(name: &str) -> String {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_http::init())
         .invoke_handler(tauri::generate_handler![yap, inspire, inform])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
